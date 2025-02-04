@@ -204,3 +204,21 @@ func (b *Board) GetWinningPossiblities(mark Mark) int {
 func (b *Board) GetMatrix() [][]Mark {
 	return b.matrix
 }
+
+func (b *Board) String() string {
+	var result string
+	for i := 0; i < len(b.matrix); i++ {
+		for j := 0; j < len(b.matrix[i]); j++ {
+			switch b.matrix[i][j] {
+			case X:
+				result += "|X"
+			case O:
+				result += "|O"
+			default:
+				result += "| "
+			}
+		}
+		result += "|\n"
+	}
+	return result
+}

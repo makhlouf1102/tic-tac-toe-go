@@ -21,7 +21,7 @@ func (c *CPUPlayer) GetNextMoveAlphaBeta(board Board) []Position {
 	beta := math.MaxInt
 	for _, move := range emptyMoves {
 		board.Play(move, c.mark)
-		score := c.GetScore(board, 1, alpha, beta)
+		score := c.GetScore(board, false, alpha, beta)
 		board.UndoPlay(move)
 
 		if score > bestScore {
@@ -36,39 +36,38 @@ func (c *CPUPlayer) GetNextMoveAlphaBeta(board Board) []Position {
 	return moves
 }
 
-func (c *CPUPlayer) GetScore(board Board, depth, alpha, beta int) int {
+func (c *CPUPlayer) GetScore(board Board, isCurrentPlayer bool, alpha, beta int) int {
 	if board.IsDone() {
-		// return board.Evaluate(c.mark) * (board.GetWinningPossiblities(GetOpponent(c.mark)) - board.GetWinningPossiblities(c.mark))
 		return board.Evaluate(c.mark)
 	}
 
 	emptyMoves := board.GetEmptyCases()
 	var score int
 	var bestScore int
+	var currentMark Mark
 
-	if depth%2 == 0 {
+	if isCurrentPlayer {
 		bestScore = math.MinInt
-		for _, move := range emptyMoves {
-			board.Play(move, c.mark)
-			score = c.GetScore(board, depth+1, alpha, beta)
-			board.UndoPlay(move)
-			bestScore = Max(bestScore, score)
-			alpha = Max(alpha, bestScore)
-			if beta <= alpha {
-				break
-			}
-		}
+		currentMark = c.mark
 	} else {
 		bestScore = math.MaxInt
-		for _, move := range emptyMoves {
-			board.Play(move, GetOpponent(c.mark))
-			score = c.GetScore(board, depth+1, alpha, beta)
-			board.UndoPlay(move)
+		currentMark = GetOpponent(c.mark)
+	}
+	for _, move := range emptyMoves {
+		board.Play(move, GetOpponent(currentMark))
+		score = c.GetScore(board, !isCurrentPlayer, alpha, beta)
+		board.UndoPlay(move)
+
+		if isCurrentPlayer {
+			bestScore = Max(bestScore, score)
+			alpha = Max(alpha, bestScore)
+		} else {
 			bestScore = Min(bestScore, score)
 			beta = Min(beta, bestScore)
-			if beta <= alpha {
-				break
-			}
+		}
+
+		if beta <= alpha {
+			break
 		}
 	}
 
