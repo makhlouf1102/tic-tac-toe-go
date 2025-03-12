@@ -4,44 +4,54 @@ import (
 	"math"
 )
 
+// CPUPlayer represents an AI player for Ultimate Tic Tac Toe.
 type CPUPlayer struct {
 	mark Mark
 }
 
+// Init initializes the CPU player with its mark.
 func (c *CPUPlayer) Init(mark Mark) {
 	c.mark = mark
 }
 
-func (c *CPUPlayer) GetNextMoveAlphaBeta(board Board) []Position {
-	moves := make([]Position, 0)
-	emptyMoves := board.GetEmptyCases()
+// GetNextMoveAlphaBeta performs an alpha-beta search on the UltimateBoard
+// and returns a slice of the best UltimateMove(s) available.
+func (c *CPUPlayer) GetNextMoveAlphaBeta(ub *UltimateBoard) []UltimateMove {
+	moves := make([]UltimateMove, 0)
+	emptyMoves := ub.GetEmptyCases()
 	bestScore := math.MinInt
 
 	alpha := math.MinInt
 	beta := math.MaxInt
+
 	for _, move := range emptyMoves {
-		board.Play(move, c.mark)
-		score := c.GetScore(board, false, alpha, beta)
-		board.UndoPlay(move)
+		// Convert UltimateMove to outer and inner positions.
+		outer := &Move{row: move.OuterRow, col: move.OuterCol}
+		inner := &Move{row: move.InnerRow, col: move.InnerCol}
+
+		ub.Play(outer, inner, c.mark)
+		score := c.GetScore(ub, false, alpha, beta)
+		ub.UndoPlay(outer, inner)
 
 		if score > bestScore {
-			moves = []Position{move}
+			moves = []UltimateMove{move}
 			bestScore = score
 		} else if score == bestScore {
 			moves = append(moves, move)
 		}
-
 	}
 
 	return moves
 }
 
-func (c *CPUPlayer) GetScore(board Board, isCurrentPlayer bool, alpha, beta int) int {
-	if board.IsDone() {
-		return board.Evaluate(c.mark)
+// GetScore evaluates the ultimate board recursively using alpha-beta pruning.
+// isCurrentPlayer indicates whose turn it is in the recursion.
+func (c *CPUPlayer) GetScore(ub *UltimateBoard, isCurrentPlayer bool, alpha, beta int) int {
+	if ub.IsDone() {
+		return ub.Evaluate(c.mark)
 	}
 
-	emptyMoves := board.GetEmptyCases()
+	emptyMoves := ub.GetEmptyCases()
 	var score int
 	var bestScore int
 	var currentMark Mark
@@ -53,10 +63,14 @@ func (c *CPUPlayer) GetScore(board Board, isCurrentPlayer bool, alpha, beta int)
 		bestScore = math.MaxInt
 		currentMark = GetOpponent(c.mark)
 	}
+
 	for _, move := range emptyMoves {
-		board.Play(move, currentMark)
-		score = c.GetScore(board, !isCurrentPlayer, alpha, beta)
-		board.UndoPlay(move)
+		outer := &Move{row: move.OuterRow, col: move.OuterCol}
+		inner := &Move{row: move.InnerRow, col: move.InnerCol}
+
+		ub.Play(outer, inner, currentMark)
+		score = c.GetScore(ub, !isCurrentPlayer, alpha, beta)
+		ub.UndoPlay(outer, inner)
 
 		if isCurrentPlayer {
 			bestScore = Max(bestScore, score)
@@ -72,21 +86,20 @@ func (c *CPUPlayer) GetScore(board Board, isCurrentPlayer bool, alpha, beta int)
 	}
 
 	return bestScore
-
 }
 
+// Max returns the greater of two integers.
 func Max(x, y int) int {
 	if x > y {
 		return x
 	}
-
 	return y
 }
 
+// Min returns the lesser of two integers.
 func Min(x, y int) int {
 	if x < y {
 		return x
 	}
-
 	return y
 }

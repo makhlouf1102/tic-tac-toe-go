@@ -3,6 +3,7 @@ package main
 type Board struct {
 	matrix [][]Mark
 	length int
+	winner Mark
 }
 
 func (b *Board) Init(size int) {
