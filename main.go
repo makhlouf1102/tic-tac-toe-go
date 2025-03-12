@@ -19,7 +19,7 @@ func main() {
 	var p1Wins, p2Wins, draws int
 
 	// Run 1000 games
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 10000; i++ {
 		board := Board{}
 		board.Init(BoardSize)
 		winner := PlayGame(&board, &player1, &player2)
@@ -36,7 +36,7 @@ func main() {
 
 	end := time.Since(beginning)
 
-	fmt.Println("Results after 1000000 games:")
+	fmt.Println("Results after 100 games:")
 	fmt.Printf("Player 1 (X) Wins: %d\n", p1Wins)
 	fmt.Printf("Player 2 (O) Wins: %d\n", p2Wins)
 	fmt.Printf("Draws: %d\n", draws)
@@ -45,7 +45,6 @@ func main() {
 
 }
 
-// Simulates a full game between two CPU players
 func PlayGame(board *Board, p1 *CPUPlayer, p2 *CPUPlayer) Mark {
 	currentPlayer := p1
 
@@ -70,6 +69,7 @@ func PlayGame(board *Board, p1 *CPUPlayer, p2 *CPUPlayer) Mark {
 		}
 	}
 
-	// If no winner, it's a draw
+	// fmt.Printf(board.String() + "\n")
+
 	return EMPTY
 }

@@ -1,9 +1,9 @@
 package main
 
-type Mark int
+type Mark string
 
 const (
-	EMPTY Mark = iota
-	X
-	O
+	EMPTY = "EMPTY"
+	X     = "X"
+	O     = "O"
 )

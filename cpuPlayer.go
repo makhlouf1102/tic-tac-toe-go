@@ -54,7 +54,7 @@ func (c *CPUPlayer) GetScore(board Board, isCurrentPlayer bool, alpha, beta int)
 		currentMark = GetOpponent(c.mark)
 	}
 	for _, move := range emptyMoves {
-		board.Play(move, GetOpponent(currentMark))
+		board.Play(move, currentMark)
 		score = c.GetScore(board, !isCurrentPlayer, alpha, beta)
 		board.UndoPlay(move)
 
