@@ -17,6 +17,7 @@ func (c *CPUPlayer) Init(mark Mark) {
 // GetNextMoveAlphaBeta performs an alpha-beta search on the UltimateBoard
 // and returns a slice of the best UltimateMove(s) available.
 func (c *CPUPlayer) GetNextMoveAlphaBeta(ub *UltimateBoard) []UltimateMove {
+	const maxDepth = 3
 	moves := make([]UltimateMove, 0)
 	emptyMoves := ub.GetEmptyCases()
 	bestScore := math.MinInt
@@ -30,7 +31,7 @@ func (c *CPUPlayer) GetNextMoveAlphaBeta(ub *UltimateBoard) []UltimateMove {
 		inner := &Move{row: move.InnerRow, col: move.InnerCol}
 
 		ub.Play(outer, inner, c.mark)
-		score := c.GetScore(ub, false, alpha, beta)
+		score := c.GetScore(ub, maxDepth, false, alpha, beta)
 		ub.UndoPlay(outer, inner)
 
 		if score > bestScore {
@@ -45,9 +46,10 @@ func (c *CPUPlayer) GetNextMoveAlphaBeta(ub *UltimateBoard) []UltimateMove {
 }
 
 // GetScore evaluates the ultimate board recursively using alpha-beta pruning.
+// The "depth" parameter limits the recursion, and if depth==0 the evaluation is returned.
 // isCurrentPlayer indicates whose turn it is in the recursion.
-func (c *CPUPlayer) GetScore(ub *UltimateBoard, isCurrentPlayer bool, alpha, beta int) int {
-	if ub.IsDone() {
+func (c *CPUPlayer) GetScore(ub *UltimateBoard, depth int, isCurrentPlayer bool, alpha, beta int) int {
+	if depth == 0 || ub.IsDone() {
 		return ub.Evaluate(c.mark)
 	}
 
@@ -69,7 +71,7 @@ func (c *CPUPlayer) GetScore(ub *UltimateBoard, isCurrentPlayer bool, alpha, bet
 		inner := &Move{row: move.InnerRow, col: move.InnerCol}
 
 		ub.Play(outer, inner, currentMark)
-		score = c.GetScore(ub, !isCurrentPlayer, alpha, beta)
+		score = c.GetScore(ub, depth-1, !isCurrentPlayer, alpha, beta)
 		ub.UndoPlay(outer, inner)
 
 		if isCurrentPlayer {

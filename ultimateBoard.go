@@ -1,5 +1,10 @@
 package main
 
+import (
+	"fmt"
+	"strings"
+)
+
 // UltimateBoard represents the Ultimate Tic Tac Toe board,
 // which is a grid of tic-tac-toe boards.
 type UltimateBoard struct {
@@ -279,4 +284,28 @@ func splitLines(s string) []string {
 		lines = append(lines, current)
 	}
 	return lines
+}
+
+func (u *UltimateBoard) Serialize() string {
+	var sb strings.Builder
+	// The overall board has 9 rows and 9 columns.
+	for ur := 0; ur < u.length; ur++ {
+		for sr := 0; sr < 3; sr++ {
+			for uc := 0; uc < u.length; uc++ {
+				for sc := 0; sc < 3; sc++ {
+					m := u.matrix[ur][uc].matrix[sr][sc]
+					var num int
+					if m == EMPTY {
+						num = 0
+					} else if m == X {
+						num = 1
+					} else if m == O {
+						num = 2
+					}
+					sb.WriteString(fmt.Sprintf("%d ", num))
+				}
+			}
+		}
+	}
+	return strings.TrimSpace(sb.String())
 }
