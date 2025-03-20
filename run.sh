@@ -1,1 +1,1 @@
-go build && ./tic-tac-toe-go
+go build && ./tic-tac-toe-go.exe
